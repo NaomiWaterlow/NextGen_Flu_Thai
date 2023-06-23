@@ -28,7 +28,7 @@ if("tictoc" %in% (.packages())){
 base_scenario_to_use <- 1 # for the economics
 societal_perspective <- TRUE
 
-disc.rate.dalys <- 0.03 #c(0,0.03)
+disc.rate.dalys <- c(0,0.03) #0.03
 disc.rate.costs <- 0.03
 thai.gdppc <- 7066.2 # Thai 2021 GDP per capita from World Bank.
 # threshold <- 0.5 * thai.gdppc
@@ -37,9 +37,10 @@ threshold <- 160000/31.98 #Thai CET in USD
 # the rest
 
 location <- "Thailand"
-n_samples <- posterior_sample_size <- 1000
+n_samples <- posterior_sample_size <- 200
 
-target_scenarios <- c(1,12,132,253,371,610) # seasonal targeting under 5s
+target_scenarios <- scenarios_to_include
+# target_scenarios <- c(1,12,132,253,371,610) # seasonal targeting under 5s
 # target_scenarios <- c(1,136,156,277,395,634) # seasonal targeting under 11s
 
 use_presampled <- F # this is always false for UK - as only have 1000 samples of each

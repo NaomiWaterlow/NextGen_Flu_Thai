@@ -51,18 +51,18 @@ overall_store[, total_infections := infections + epidemic_cases]
 # overall_store[variable == "rel_sus_5", variable := "X5"]
 # overall_store[variable == "rel_sus_6", variable := "X6"]
 overall_store[,scenario := as.factor(scenario)]
-INFECTIONS_TIME <- ggplot(overall_store[sample==1],
-       aes(x = Date, y = total_infections, group = interaction(sample, scenario), colour =scenario)) + 
-  geom_line(alpha=1) +
-  # geom_ribbon() +
-  facet_grid(virus_type~variable, scales= "free_y")  + scale_colour_manual(values = c("#d73027","orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) +
-  theme_linedraw() + 
-  theme(
-        axis.text.x = element_text(angle = -90), 
-        strip.text.y = element_text(size = 7)) + 
-  labs(x = "", y = "Infections")
-
-print(INFECTIONS_TIME)
+# INFECTIONS_TIME <- ggplot(overall_store[sample==1],
+#        aes(x = Date, y = total_infections, group = interaction(sample, scenario), colour =scenario)) + 
+#   geom_line(alpha=1) +
+#   # geom_ribbon() +
+#   facet_grid(virus_type~variable, scales= "free_y")  + scale_colour_manual(values = c("#d73027","orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) +
+#   theme_linedraw() + 
+#   theme(
+#         axis.text.x = element_text(angle = -90), 
+#         strip.text.y = element_text(size = 7)) + 
+#   labs(x = "", y = "Infections")
+# 
+# print(INFECTIONS_TIME)
                  
 total_infections_all <- dcast.data.table(overall_store, 
                                          Date + scenario + virus_type + sample ~ variable, 

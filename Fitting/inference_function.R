@@ -25,7 +25,7 @@ custom_inference <- function(input_demography, vaccine_calendar, input_polymod, 
     contacts <- fluEvidenceSynthesis::contact_matrix(as.matrix(input_polymod),
                                                      input_demography, age.group.limits ) 
     
-    age.groups <- stratify_by_age(input_demography, 
+    age.groups <- fluEvidenceSynthesis::stratify_by_age(input_demography, 
                                   age.group.limits )
     
     
@@ -54,6 +54,7 @@ custom_inference <- function(input_demography, vaccine_calendar, input_polymod, 
                                  previous_summary = NA, 
                                  age_groups_model = age.group.limits)
 
+    # browser()
     odes <- data.table(odes)
     # Ignore times row
     odes[,Month := month(time)]
@@ -73,21 +74,26 @@ custom_inference <- function(input_demography, vaccine_calendar, input_polymod, 
     }
     return(total_ll)
   }
+  
   llprior <- function(pars) {
  
     # 1 is reported 
     # 2 is transmission
     # 3 is susceptibility
-    # 4 is initinal start
-    if (exp(pars[1]) < 0 || pars[4] < log(0.00001) || pars[4] > 29.5 ){ # 29.5 as 0.01% of population
-      return(-Inf)}
+    # 4 is initial start
+    if (
+      exp(pars[1]) < 0 || pars[4] < log(0.00001) || pars[4] > 29.5 # 29.5 as 0.01% of population
+    ){return(-Inf)}
     
  lprob <- 0
+ 
  # prior on the R0 
- R0 <- fluEvidenceSynthesis::as_R0(transmission_rate = pars[2]/100,
-                             contact_matrix =contacts_matrixformat, 
-                             age_groups = stratify_by_age(popthai[,2], limits = 
-                                                            age.group.limits))
+ R0 <- fluEvidenceSynthesis::as_R0(
+   transmission_rate = pars[2]/100,
+   contact_matrix =contacts_matrixformat, 
+   age_groups = stratify_by_age(popthai[,2], 
+                                limits = 
+                                  age.group.limits))
  lprob <- lprob + dgamma(R0-1, shape = r0_gamma_pars[1], 
                          rate =r0_gamma_pars[2], log = T)
  lprob <- lprob + dbeta(pars[3], shape1 = sus_beta_pars[1], 
@@ -176,7 +182,7 @@ infectionODEs_epidemic_yearcross2 <- function(population_stratified,
   y$time <- seq(begin_date,length.out = nrow(y), by =interval)
   y<-data.table(y)
   # reformat the dates
-
+  # browser()
   return(y)
   
 }
@@ -226,7 +232,7 @@ incidence_function_fit <- function(demography_input,
                                    previous_summary = previous_summary
   )
   
-  
+  # browser()
   
   
 }

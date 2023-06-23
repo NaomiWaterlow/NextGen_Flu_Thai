@@ -18,5 +18,5 @@ source(here::here("Economics","5_2_deaths.R"))
 source(here::here("Economics","5_3_discounting.R"))
 
 # Plots etc.
-source(here::here("Economics","5_4_econ_plots.R"))
+# source(here::here("Economics","5_4_econ_plots.R"))
 

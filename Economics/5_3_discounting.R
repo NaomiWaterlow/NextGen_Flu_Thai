@@ -47,18 +47,18 @@ sum_outcomes <- outcomes[
   by = c("sample","scenario","Season","disc.rate.dalys","disc.rate.costs")
 ] 
 
-DALYS <- ggplot(sum_outcomes,
-                aes(x = Season, y = disc_DALYs, colour = scenario)) +
-  geom_point() +
-  facet_grid(scenario~disc.rate.dalys) +
-  labs(y = "discounted DALYs") +
-  theme_linedraw()
-
-COSTS <- ggplot(sum_outcomes,
-                aes(x = Season, y = disc_costs.outcomes, colour = scenario)) +
-  geom_point() +
-  facet_grid(scenario~.) +
-  labs(y = "discounted healthcare costs") + theme_linedraw()
+# DALYS <- ggplot(sum_outcomes[sample==1],
+#                 aes(x = scenario, y = disc_DALYs, colour = Season)) +
+#   geom_point() +
+#   # facet_grid(scenario~disc.rate.dalys) +
+#   labs(y = "discounted DALYs") +
+#   theme_linedraw()
+# 
+# COSTS <- ggplot(sum_outcomes,
+#                 aes(x = Season, y = disc_costs.outcomes, colour = scenario)) +
+#   geom_point() +
+#   facet_grid(scenario~.) +
+#   labs(y = "discounted healthcare costs") + theme_linedraw()
 
 # combine across seasons
 summary_stats <- copy(sum_outcomes)
@@ -77,49 +77,60 @@ summary_stats[,inc_costs.total := disc_costs.total - base_costs.total]
 summary_stats[, icer := inc_costs.total/inc_DALYs]
 summary_stats[, icer_gained := -icer] # DALYs averted
 
-summary_stats[scenario == target_scenarios[1], scenario_name := vaccine_scenario_names[1]]
-summary_stats[scenario == target_scenarios[2], scenario_name := vaccine_scenario_names[2]]
-summary_stats[scenario == target_scenarios[3], scenario_name := vaccine_scenario_names[3]]
-summary_stats[scenario == target_scenarios[4], scenario_name := vaccine_scenario_names[4]]
-summary_stats[scenario == target_scenarios[5], scenario_name := vaccine_scenario_names[5]]
-summary_stats[scenario == target_scenarios[6], scenario_name := vaccine_scenario_names[6]]
-summary_stats$scenario_name <- factor(summary_stats$scenario_name, 
-                                      levels = vaccine_scenario_names)
+summary_stats <- merge(summary_stats,vaccine_scenarios_tab[,.(scenario_id,CoveragePercent,TargetAge,NGIVtype)],by.x="scenario",by.y="scenario_id")
 
-if(base_scenario_to_use ==1){
-ICERS <- ggplot(summary_stats[!(scenario %in% c(1))], aes(x = scenario_name, y = icer_gained, fill = scenario_name)) + 
-  geom_boxplot() + 
+summary_stats$NGIVtype <- factor(
+  summary_stats$NGIVtype,
+  levels = c("No vaccine","Current seasonal","Improved (minimal)","Improved (efficacy)" ,"Improved (breadth)","Universal")
+)
+summary_stats$TargetAge <- factor(
+  summary_stats$TargetAge,
+  levels = c("0 to 5 years","0 to 11 years","0 to 17 years","2 to 11 years","6 to 11 years","12 to 17 years")
+)
+
+
+# summary_stats[scenario == target_scenarios[1], scenario_name := vaccine_scenario_names[1]]
+# summary_stats[scenario == target_scenarios[2], scenario_name := vaccine_scenario_names[2]]
+# summary_stats[scenario == target_scenarios[3], scenario_name := vaccine_scenario_names[3]]
+# summary_stats[scenario == target_scenarios[4], scenario_name := vaccine_scenario_names[4]]
+# summary_stats[scenario == target_scenarios[5], scenario_name := vaccine_scenario_names[5]]
+# summary_stats[scenario == target_scenarios[6], scenario_name := vaccine_scenario_names[6]]
+# summary_stats$scenario_name <- factor(summary_stats$scenario_name, 
+#                                       levels = vaccine_scenario_names)
+
+
+
+ICERS <- ggplot(
+  summary_stats[!(scenario %in% c(1))], #& CoveragePercent == "50%"], 
+  aes(x = NGIVtype, y = icer_gained, fill = NGIVtype)
+) +
+  geom_boxplot(outlier.shape = NA, notch=TRUE) +
+  # geom_violin() +
   theme_linedraw() +
-  labs(x = "Scenario", y = "ICER (Inc cost per DALY averted in USD)", title="a") + 
+  labs(x = "Scenario", y = "ICER (Inc cost per DALY averted in USD)", title="Target age group and coverage", legend="Vaccine type") + 
   scale_fill_manual(values = c("orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) +
   theme(axis.text.x = element_blank(),
-        legend.position = "none") #+
-  # facet_grid(disc.rate.dalys~.)
-} else if(base_scenario_to_use > 1){
-  ICERS <- ggplot(summary_stats[!(scenario %in% c(1,2))], aes(x = scenario_name, y = icer_gained, fill = scenario_name)) + 
-    geom_boxplot() + 
-    theme_linedraw() +
-    labs(x = "Scenario", y = "ICER (Inc cost per DALY averted in USD)", title="a") + 
-    scale_fill_manual(values = c( "#91CF60", "#92C5DE", "#3288BD","purple" )) #+
-    # facet_grid(disc.rate.dalys~.)
-} 
+        legend.position = "bottom") +
+  facet_grid(disc.rate.dalys~TargetAge+CoveragePercent)
+
 
 # INMB
 summary_stats[, INMB :=  ((-inc_DALYs * threshold) - inc_costs.total)/1E6] # INMB in millions
 
 INMBS <- ggplot(
-  summary_stats[scenario_name != vaccine_scenario_names[1],], 
-  aes(x = scenario_name, y = INMB, fill = scenario_name)
+  summary_stats[scenario != 1,], 
+  aes(x = NGIVtype, y = INMB, fill = NGIVtype)
 ) + 
-  geom_boxplot() + 
+  geom_boxplot(outlier.shape = NA, notch=TRUE) +
   theme_linedraw() + 
-  labs(x = "Scenario", y = "INMB (in millions USD)", title="") + 
-  scale_fill_manual(values = c("orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) + 
-  theme(legend.position = "None", 
-        axis.text.x = element_text(angle = -90), 
+  labs(x = "Scenario", y = "INMB (in millions USD)", title="Target age group and coverage") + 
+  scale_fill_manual(values = c("orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) +
+  theme(legend.position = "bottom", 
+        # axis.text.x = element_text(angle = -90),
+        axis.text.x = element_blank(),
         axis.title.x = element_blank()) + 
-  scale_x_discrete(labels = function(y) str_wrap(y, width = 10)) #+
-  # facet_grid(disc.rate.dalys~.)
+  scale_x_discrete(labels = function(y) str_wrap(y, width = 10)) +
+  facet_grid(.~TargetAge+CoveragePercent)
 
 
 ICERS
@@ -127,38 +138,40 @@ INMBS
 
 PLANE <- ggplot(
   data = summary_stats[!(scenario %in% c(1))],
-  aes(x = -inc_DALYs/1E3, y = inc_costs.total/1E6, colour = scenario_name)
+  aes(x = -inc_DALYs/1E3, y = inc_costs.total/1E6, colour = NGIVtype)
 ) + 
-  geom_point() + 
+  geom_point(shape=".") + 
+  stat_ellipse() +
   theme_linedraw() + 
   labs(x = "Incremental DALYs averted (thousands)", y = "Incremental costs (in millions USD)", 
-       colour = "Scenario", title = "b") + 
+       colour = "Scenario", title = "Target age group and coverage") + 
   scale_colour_manual(values = c("orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) +
-  geom_abline(intercept=0, slope=threshold/1000, linetype="dashed") #+
-  # facet_grid(disc.rate.dalys~.)
+  geom_abline(intercept=0, slope=threshold/1000, linetype="dashed") +
+  facet_grid(CoveragePercent~TargetAge)
 
 
 # Vaccine threshold price
 summary_stats[
-  scenario_name != vaccine_scenario_names[1], 
+  !(scenario %in% c(1)), 
   threshold_price := 
     ((-inc_DALYs * threshold) - inc_costs.total + disc_costs.vacc_purchase) / # this is the INMB with a vaccine price of zero
     disc_vaccs                                                              # dividing this through by the discounted number of vaccines gives the threshold price
 ]
 
 THRESHOLD_PRICES <- ggplot(
-  summary_stats[scenario_name != vaccine_scenario_names[1],], 
-  aes(x = scenario_name, y = threshold_price, fill = scenario_name)
+  data = summary_stats[!(scenario %in% c(1))], 
+  aes(x = NGIVtype, y = threshold_price, fill = NGIVtype)
 ) + 
-  geom_boxplot() + 
+  geom_boxplot(outlier.shape = NA, notch=TRUE) +
   theme_linedraw() + 
-  labs(x = "Scenario", y = "Vaccine Threshold Price (USD)", title="") + 
+  labs(x = "Scenario", y = "Vaccine Threshold Price (USD)", title="Target age group and coverage") + 
   scale_fill_manual(values = c("orange1", "#91CF60", "#92C5DE", "#3288BD","purple" )) + 
-  theme(legend.position = "None", 
-        axis.text.x = element_text(angle = -90), 
+  theme(legend.position = "bottom", 
+        # axis.text.x = element_text(angle = -90), 
+        axis.text.x = element_blank(),
         axis.title.x = element_blank()) + 
-  scale_x_discrete(labels = function(y) str_wrap(y, width = 10)) #+
-  # facet_grid(disc.rate.dalys~.)
+  scale_x_discrete(labels = function(y) str_wrap(y, width = 10)) +
+  facet_grid(.~TargetAge+CoveragePercent)
 
 # tables
 

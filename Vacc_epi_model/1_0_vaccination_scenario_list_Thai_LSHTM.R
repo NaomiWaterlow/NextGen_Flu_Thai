@@ -9,24 +9,26 @@ year_days <- c(365,365,365,366,365)
 # from https://www.cdc.gov/flu/vaccines-work/past-seasons-estimates.html
 # assuming SH and NH the same, and differetn viral subtypes the saem
 
+# Have updated for Thailand using Table 3 from Chittaganpitch et al.
+
 H1_matches <- c(
-  "2005_SH" = "NOMATCH",
-  "2005_NH" = "NOMATCH",
+  "2005_SH" = "MATCH", #"2005_SH" = "NOMATCH",
+  "2005_NH" = "MATCH", #"2005_NH" = "NOMATCH",
   "2006_SH" = "MATCH",
   "2006_NH" = "MATCH",
   "2007_SH" = "NOMATCH",
-  "2007_NH" = "NOMATCH",
-  "2008_SH" = "MATCH",
+  "2007_NH" = "MATCH", #"2007_NH" = "NOMATCH",
+  "2008_SH" = "NOMATCH", #"2008_SH" = "MATCH",
   "2008_NH" = "MATCH",
-  "2009_SH" = "MATCH", 
-  "2009_NH" = "MATCH",
+  "2009_SH" = "NOMATCH", #"2009_SH" = "MATCH", 
+  "2009_NH" = "NOMATCH", #"2009_NH" = "MATCH",
   "20010_SH" = NA
 )
 # 
 H3_matches <- c(
   "2005_SH" = "NOMATCH",
-  "2005_NH" = "NOMATCH",
-  "2006_SH" = "MATCH",
+  "2005_NH" = "MATCH", #"2005_NH" = "NOMATCH",
+  "2006_SH" = "NOMATCH", #"2006_SH" = "MATCH",
   "2006_NH" = "MATCH",
   "2007_SH" = "NOMATCH",
   "2007_NH" = "NOMATCH",
@@ -40,13 +42,13 @@ H3_matches <- c(
 B_matches <- c(
   "2005_SH" = "NOMATCH",
   "2005_NH" = "NOMATCH",
-  "2006_SH" = "MATCH",
-  "2006_NH" = "MATCH",
+  "2006_SH" = "NOMATCH", #"2006_SH" = "MATCH",
+  "2006_NH" = "NOMATCH", #"2006_NH" = "MATCH",
   "2007_SH" = "NOMATCH",
   "2007_NH" = "NOMATCH",
   "2008_SH" = "MATCH",
   "2008_NH" = "MATCH",
-  "2009_SH" = "MATCH", 
+  "2009_SH" = "NOMATCH", #"2009_SH" = "MATCH", 
   "2009_NH" = "MATCH",
   "20010_SH" = NA
 )
@@ -61,28 +63,32 @@ efficacies <- list(
 
 # start in march as this is the "year end" / "birthday"
 campaigns <- list(
-  dates_campaign = c("-05-01","-07-31"), # May to July (Making it -07-31, so that 90 days generated in model)
-  dates_yearround = c("-03-02") # all year round
+  dates_campaign = c("-05-01","-07-31")#, # May to July (Making it -07-31, so that 90 days generated in model)
+  # dates_yearround = c("-03-02") # all year round
 )
 
 # this is the coverage over the dates period
 # i.e. over one year in the year round scenario, and over the 3 months in the 3 month scenario
+# NOTE: Have added 10% coverage in over 60s to all scenarios in line with Meeyai et al.
 coverages <- list(
-  coverage_low_under5 = c(0.25, 0.25,rep(0,16)),
-  coverage_mid_under5 = c(0.5, 0.5,rep(0,16)),
-  coverage_high_under5 = c(0.75, 0.75,rep(0,16)),
-  coverage_low_under11 = c(0.25, 0.25, 0.25,rep(0,15)),
-  coverage_mid_under11 = c(0.5, 0.5, 0.5,rep(0,15)),
-  coverage_high_under11 = c(0.75, 0.75, 0.75,rep(0,15)),
-  coverage_low_2to11 = c(0, 0.25, 0.25,rep(0,15)),
-  coverage_mid_2to11 = c(0, 0.5, 0.5,rep(0,15)),
-  coverage_high_2to11 = c(0, 0.75, 0.75,rep(0,15)),
-  coverage_low_over60 = c(rep(0,5),0.25,rep(0,12)),
-  coverage_mid_over60 = c(rep(0,5),0.5,rep(0,12)),
-  coverage_high_over60 = c(rep(0,5),0.75,rep(0,12)),
-  coverage_low_under5over60 = c(0.25, 0.25,rep(0,3),0.25,rep(0,12)),
-  coverage_mid_under5over60 = c(0.5, 0.5,rep(0,3),0.5,rep(0,12)),
-  coverage_high_under5over60 = c(0.75, 0.75,rep(0,3),0.75,rep(0,12))
+  coverage_low_0to5    = c(0.25, 0.25, 0.00, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_mid_0to5    = c(0.5 , 0.50, 0.00, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_high_0to5   = c(0.75, 0.75, 0.00, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_low_0to11   = c(0.25, 0.25, 0.25, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_mid_0to11   = c(0.50, 0.50, 0.50, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_high_0to11  = c(0.75, 0.75, 0.75, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_low_0to17   = c(0.25, 0.25, 0.25, 0.25, 0.00, 0.10, rep(0,12)),
+  coverage_mid_0to17   = c(0.50, 0.50, 0.50, 0.50, 0.00, 0.10, rep(0,12)),
+  coverage_high_0to17  = c(0.75, 0.75, 0.75, 0.75, 0.00, 0.10, rep(0,12)),
+  coverage_low_2to11   = c(0.00, 0.25, 0.25, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_mid_2to11   = c(0.00, 0.50, 0.50, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_high_2to11  = c(0.00, 0.75, 0.75, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_low_6to11   = c(0.00, 0.00, 0.25, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_mid_6to11   = c(0.00, 0.00, 0.50, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_high_6to11  = c(0.00, 0.00, 0.75, 0.00, 0.00, 0.10, rep(0,12)),
+  coverage_low_12to17  = c(0.00, 0.00, 0.00, 0.25, 0.00, 0.10, rep(0,12)),
+  coverage_mid_12to17  = c(0.00, 0.00, 0.00, 0.50, 0.00, 0.10, rep(0,12)),
+  coverage_high_12to17 = c(0.00, 0.00, 0.00, 0.75, 0.00, 0.10, rep(0,12))
 )
 
 durations <- c(
@@ -205,6 +211,77 @@ for(d in 1:length(durations)){
 }
 vaccine_scenarios_tab <- as.data.table(vaccine_scenarios_tab)
 
-# if(exact_efficacies==T){
-#   source("current_efficacy_sensitivity.R")
-# }
+vaccine_scenarios_tab[
+  immunity_duration=="six_months" & efficacy=="efficacy_NOMATCH_0.4",
+  NGIVtype := "Current seasonal"
+]
+vaccine_scenarios_tab[
+  immunity_duration=="one_year" & efficacy=="efficacy_NOMATCH_0.4",
+  NGIVtype := "Improved (minimal)"
+]
+vaccine_scenarios_tab[
+  immunity_duration=="two_year" & efficacy=="efficacy_NOMATCH_0.7",
+  NGIVtype := "Improved (efficacy)"
+]
+vaccine_scenarios_tab[
+  immunity_duration=="three_year" & efficacy=="efficacy_constant_0.7",
+  NGIVtype := "Improved (breadth)"
+]
+vaccine_scenarios_tab[
+  immunity_duration=="five_year" & efficacy=="efficacy_constant_0.9",
+  NGIVtype := "Universal"
+]
+vaccine_scenarios_tab[
+  immunity_duration=="no vaccine",
+  NGIVtype := "No vaccine"
+]
+
+vaccine_scenarios_tab[
+  coverage %like% "_high_",
+  CoveragePercent := "75%"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_mid_",
+  CoveragePercent := "50%"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_low_",
+  CoveragePercent := "25%"
+]
+
+vaccine_scenarios_tab[
+  coverage %like% "_0to5",
+  TargetAge := "0 to 5 years"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_0to11",
+  TargetAge := "0 to 11 years"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_0to17",
+  TargetAge := "0 to 17 years"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_2to11",
+  TargetAge := "2 to 11 years"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_6to11",
+  TargetAge := "6 to 11 years"
+]
+vaccine_scenarios_tab[
+  coverage %like% "_12to17",
+  TargetAge := "12 to 17 years"
+]
+
+
+
+scenarios_to_include <- sort(
+  as.numeric(
+    vaccine_scenarios_tab[
+      !is.na(NGIVtype) & (coverage=="no vaccine" | coverage %like% "coverage_mid_"),
+      scenario_id
+    ])
+)
+
+vaccine_scenarios_tab <- vaccine_scenarios_tab[scenario_id %in% scenarios_to_include]

@@ -16,7 +16,7 @@ for (epidemic_to_run in 1:6){
   if(epidemic_to_run >6){
     epidemic_no = epidemic_to_run-6
   }
-  output_list <-  readRDS(file = here::here("Fitting", "Fits", paste0("mcmc_",epidemic_to_run,"_to_use.Rdata")))
+  output_list <-  readRDS(file = here::here("Fitting", "Fits", paste0("mcmc_",epidemic_to_run,"_to_use.Rdata"))) #"_to_use.Rdata"))) # "_10000_2023-01-25.Rdata")))
   
   colnames(output_list$posterior$batch) <- c("reporting", "transmissibility", "sus1",
                                              "infected", "blank", "blank")
@@ -127,5 +127,5 @@ for (epidemic_to_run in 1:6){
 }
 # c(-7, 0.07, 0.9, 0.9, 0.9, 0.4)# gives an outbreak
 
-DENSITY <- grid.arrange(DENSITY[[1]],DENSITY[[2]],DENSITY[[3]],DENSITY[[4]],DENSITY[[5]],DENSITY[[6]],ncol=1,nrow=6)
-SPAGHETTI <- grid.arrange(SPAGHETTI[[1]],SPAGHETTI[[2]],SPAGHETTI[[3]],SPAGHETTI[[4]],SPAGHETTI[[5]],SPAGHETTI[[6]],ncol=1,nrow=6)
+# DENSITY <- grid.arrange(DENSITY[[1]],DENSITY[[2]],DENSITY[[3]],DENSITY[[4]],DENSITY[[5]],DENSITY[[6]],ncol=1,nrow=6)
+SPAGHETTI_ALL <- grid.arrange(SPAGHETTI[[1]],SPAGHETTI[[2]],SPAGHETTI[[3]],SPAGHETTI[[4]],SPAGHETTI[[5]],SPAGHETTI[[6]],ncol=2,nrow=3)
